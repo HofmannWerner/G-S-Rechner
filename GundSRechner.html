@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gold & Silber Rechner</title>
+    <title>Gold & Silber Rechner - Live</title>
     <style>
         * {
             margin: 0;
@@ -83,16 +83,6 @@
             box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
         }
 
-        button:active {
-            transform: translateY(0);
-        }
-
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
         .results {
             margin-top: 30px;
             padding: 25px;
@@ -107,14 +97,8 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .price-item {
@@ -125,19 +109,9 @@
             border-bottom: 1px solid #e0e0e0;
         }
 
-        .price-item:last-child {
-            border-bottom: none;
-        }
-
-        .price-label {
-            color: #666;
-            font-size: 14px;
-        }
-
         .price-value {
             font-weight: 700;
             color: #333;
-            font-size: 16px;
         }
 
         .total {
@@ -156,6 +130,7 @@
             color: #667eea;
             font-weight: 600;
             margin-top: 15px;
+            display: none;
         }
 
         .error {
@@ -167,14 +142,7 @@
             display: none;
         }
 
-        .error.show {
-            display: block;
-        }
-
-        .metal-icon {
-            font-size: 24px;
-            margin-right: 10px;
-        }
+        .error.show { display: block; }
 
         .timestamp {
             text-align: center;
@@ -183,222 +151,142 @@
             margin-top: 15px;
         }
 
-        .info-note {
-            background: #e3f2fd;
-            color: #1565c0;
-            padding: 10px;
-            border-radius: 8px;
+        .key-btn {
+            background: none;
+            border: none;
+            color: #667eea;
             font-size: 12px;
-            margin-top: 15px;
-            text-align: center;
+            text-decoration: underline;
+            cursor: pointer;
+            width: auto;
+            margin: 10px auto;
+            display: block;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>💰 Edelmetall Rechner</h1>
-        
-        <div class="input-group">
-            <label for="silver">
-                <span class="metal-icon">🥈</span>Anzahl Unzen Silber
-            </label>
-            <input type="number" id="silver" min="0" step="0.01" value="0" placeholder="z.B. 10">
-        </div>
 
-        <div class="input-group">
-            <label for="gold">
-                <span class="metal-icon">🥇</span>Anzahl Unzen Gold
-            </label>
-            <input type="number" id="gold" min="0" step="0.01" value="0" placeholder="z.B. 2">
-        </div>
+<div class="container">
+    <h1>💰 Edelmetall Rechner</h1>
 
-        <button id="calculateBtn" onclick="calculateValue()">
-            Wert berechnen
-        </button>
-
-        <div class="loading" id="loading" style="display: none;">
-            Preise werden abgerufen...
-        </div>
-
-        <div class="error" id="error"></div>
-
-        <div class="results" id="results">
-            <div class="price-item">
-                <span class="price-label">Aktueller Silberpreis (1 oz)</span>
-                <span class="price-value" id="silverPrice">-</span>
-            </div>
-            <div class="price-item">
-                <span class="price-label">Deine Silber-Unzen</span>
-                <span class="price-value" id="silverOunces">-</span>
-            </div>
-            <div class="price-item">
-                <span class="price-label">Silber Gesamtwert</span>
-                <span class="price-value" id="silverTotal">-</span>
-            </div>
-
-            <div class="price-item" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
-                <span class="price-label">Aktueller Goldpreis (1 oz)</span>
-                <span class="price-value" id="goldPrice">-</span>
-            </div>
-            <div class="price-item">
-                <span class="price-label">Deine Gold-Unzen</span>
-                <span class="price-value" id="goldOunces">-</span>
-            </div>
-            <div class="price-item">
-                <span class="price-label">Gold Gesamtwert</span>
-                <span class="price-value" id="goldTotal">-</span>
-            </div>
-
-            <div class="price-item total">
-                <span class="price-label"><strong>Gesamtwert Portfolio</strong></span>
-                <span class="price-value" id="totalValue">-</span>
-            </div>
-
-            <div class="timestamp" id="timestamp"></div>
-            <div class="info-note" id="priceSource">
-                Preise von verschiedenen Quellen aggregiert
-            </div>
-        </div>
+    <div class="input-group">
+        <label for="silver">🥈 Anzahl Unzen Silber</label>
+        <input type="number" id="silver" min="0" step="0.01" value="0">
     </div>
 
-    <script>
-        // Lade gespeicherte Werte beim Start
-        window.addEventListener('DOMContentLoaded', function() {
-            const savedSilver = localStorage.getItem('silverOunces');
-            const savedGold = localStorage.getItem('goldOunces');
-            
-            if (savedSilver !== null) {
-                document.getElementById('silver').value = savedSilver;
-            }
-            if (savedGold !== null) {
-                document.getElementById('gold').value = savedGold;
-            }
+    <div class="input-group">
+        <label for="gold">🥇 Anzahl Unzen Gold</label>
+        <input type="number" id="gold" min="0" step="0.01" value="0">
+    </div>
+
+    <button id="calculateBtn" onclick="calculateValue()">Wert berechnen</button>
+
+    <button class="key-btn" onclick="askForApiKey()">API-Key ändern</button>
+
+    <div class="loading" id="loading">Preise werden live abgefragt...</div>
+    <div class="error" id="error"></div>
+
+    <div class="results" id="results">
+        <div class="price-item">
+            <span>Silber (1 oz)</span>
+            <span class="price-value" id="silverPrice">-</span>
+        </div>
+        <div class="price-item">
+            <span>Silber Wert</span>
+            <span class="price-value" id="silverTotal">-</span>
+        </div>
+
+        <div class="price-item" style="margin-top: 10px;">
+            <span>Gold (1 oz)</span>
+            <span class="price-value" id="goldPrice">-</span>
+        </div>
+        <div class="price-item">
+            <span>Gold Wert</span>
+            <span class="price-value" id="goldTotal">-</span>
+        </div>
+
+        <div class="price-item total">
+            <span><strong>Gesamtwert</strong></span>
+            <span class="price-value" id="totalValue">-</span>
+        </div>
+
+        <div class="timestamp" id="timestamp"></div>
+    </div>
+</div>
+
+<script>
+    const API_URL = 'https://www.goldapi.io/api';
+
+    // Beim Start: Werte aus lokalem Speicher laden
+    window.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('silver').value = localStorage.getItem('silverOunces') || 0;
+        document.getElementById('gold').value = localStorage.getItem('goldOunces') || 0;
+    });
+
+    function askForApiKey() {
+        const key = prompt("Bitte GoldAPI.io Key eingeben:");
+        if (key) {
+            localStorage.setItem('gold_api_key', key.trim());
+            alert("Key gespeichert!");
+        }
+    }
+
+    async function fetchPrice(symbol, key) {
+        const res = await fetch(`${API_URL}/${symbol}/EUR`, {
+            headers: { "x-access-token": key, "Content-Type": "application/json" }
         });
+        if (!res.ok) throw new Error(res.status === 403 ? "KEY_ERROR" : "API_ERROR");
+        return await res.json();
+    }
 
-        // Speichere Werte bei jeder Änderung
-        document.getElementById('silver').addEventListener('input', function() {
-            localStorage.setItem('silverOunces', this.value);
-        });
+    async function calculateValue() {
+        const silverOz = parseFloat(document.getElementById('silver').value) || 0;
+        const goldOz = parseFloat(document.getElementById('gold').value) || 0;
+        const key = localStorage.getItem('gold_api_key');
 
-        document.getElementById('gold').addEventListener('input', function() {
-            localStorage.setItem('goldOunces', this.value);
-        });
-
-        async function calculateValue() {
-            const silverOunces = parseFloat(document.getElementById('silver').value) || 0;
-            const goldOunces = parseFloat(document.getElementById('gold').value) || 0;
-            
-            const calculateBtn = document.getElementById('calculateBtn');
-            const loading = document.getElementById('loading');
-            const results = document.getElementById('results');
-            const errorDiv = document.getElementById('error');
-
-            // Reset
-            errorDiv.classList.remove('show');
-            results.classList.remove('show');
-            
-            // Disable button and show loading
-            calculateBtn.disabled = true;
-            loading.style.display = 'block';
-
-            try {
-                let goldPriceEUR, silverPriceEUR;
-                let priceSource = 'Marktdurchschnitt';
-
-                // Hole aktuellen Wechselkurs USD zu EUR
-                const exchangeResponse = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-                const exchangeData = await exchangeResponse.json();
-                const usdToEur = exchangeData.rates.EUR;
-
-                // Aktuelle Spotpreise in USD (Februar 2026)
-                // Quelle: Durchschnitt der Weltmarktpreise
-                const goldPriceUSD = 5050; // ca. aktueller Goldpreis in USD/oz
-                const silverPriceUSD = 83;  // ca. aktueller Silberpreis in USD/oz
-                
-                goldPriceEUR = goldPriceUSD * usdToEur;
-                silverPriceEUR = silverPriceUSD * usdToEur;
-
-                // Berechnungen
-                const silverValue = silverOunces * silverPriceEUR;
-                const goldValue = goldOunces * goldPriceEUR;
-                const totalValue = silverValue + goldValue;
-
-                // Anzeige aktualisieren
-                document.getElementById('silverPrice').textContent = formatCurrency(silverPriceEUR);
-                document.getElementById('silverOunces').textContent = silverOunces.toFixed(2) + ' oz';
-                document.getElementById('silverTotal').textContent = formatCurrency(silverValue);
-
-                document.getElementById('goldPrice').textContent = formatCurrency(goldPriceEUR);
-                document.getElementById('goldOunces').textContent = goldOunces.toFixed(2) + ' oz';
-                document.getElementById('goldTotal').textContent = formatCurrency(goldValue);
-
-                document.getElementById('totalValue').textContent = formatCurrency(totalValue);
-
-                const now = new Date();
-                document.getElementById('timestamp').textContent = 
-                    'Aktualisiert: ' + now.toLocaleString('de-DE');
-                
-                document.getElementById('priceSource').textContent = 
-                    `Preise basierend auf ${priceSource} (Wechselkurs: 1 USD = ${usdToEur.toFixed(4)} EUR)`;
-
-                results.classList.add('show');
-
-            } catch (error) {
-                console.error('Fehler:', error);
-                errorDiv.textContent = 'Fehler beim Abrufen der Wechselkurse. Verwende geschätzte Preise: Gold ~4.700€/oz, Silber ~77€/oz';
-                errorDiv.style.background = '#fff3cd';
-                errorDiv.style.color = '#856404';
-                errorDiv.classList.add('show');
-                
-                // Fallback mit festen EUR Preisen
-                const goldPriceEUR = 4700;
-                const silverPriceEUR = 77;
-                
-                const silverValue = silverOunces * silverPriceEUR;
-                const goldValue = goldOunces * goldPriceEUR;
-                const totalValue = silverValue + goldValue;
-
-                document.getElementById('silverPrice').textContent = formatCurrency(silverPriceEUR);
-                document.getElementById('silverOunces').textContent = silverOunces.toFixed(2) + ' oz';
-                document.getElementById('silverTotal').textContent = formatCurrency(silverValue);
-
-                document.getElementById('goldPrice').textContent = formatCurrency(goldPriceEUR);
-                document.getElementById('goldOunces').textContent = goldOunces.toFixed(2) + ' oz';
-                document.getElementById('goldTotal').textContent = formatCurrency(goldValue);
-
-                document.getElementById('totalValue').textContent = formatCurrency(totalValue);
-
-                const now = new Date();
-                document.getElementById('timestamp').textContent = 
-                    'Berechnet: ' + now.toLocaleString('de-DE');
-                
-                document.getElementById('priceSource').textContent = 
-                    'Geschätzte Preise (offline Modus)';
-
-                results.classList.add('show');
-            } finally {
-                calculateBtn.disabled = false;
-                loading.style.display = 'none';
-            }
+        if (!key) {
+            askForApiKey();
+            return;
         }
 
-        function formatCurrency(value) {
-            return new Intl.NumberFormat('de-DE', {
-                style: 'currency',
-                currency: 'EUR',
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }).format(value);
+        // Werte speichern
+        localStorage.setItem('silverOunces', silverOz);
+        localStorage.setItem('goldOunces', goldOz);
+
+        const loader = document.getElementById('loading');
+        const errDiv = document.getElementById('error');
+        const resDiv = document.getElementById('results');
+
+        errDiv.classList.remove('show');
+        resDiv.classList.remove('show');
+        loader.style.display = 'block';
+
+        try {
+            const [goldData, silverData] = await Promise.all([
+                fetchPrice('XAU', key),
+                fetchPrice('XAG', key)
+            ]);
+
+            document.getElementById('goldPrice').textContent = format(goldData.price);
+            document.getElementById('goldTotal').textContent = format(goldData.price * goldOz);
+            document.getElementById('silverPrice').textContent = format(silverData.price);
+            document.getElementById('silverTotal').textContent = format(silverData.price * silverOz);
+            document.getElementById('totalValue').textContent = format((goldData.price * goldOz) + (silverData.price * silverOz));
+
+            document.getElementById('timestamp').textContent = 'Stand: ' + new Date().toLocaleString('de-DE');
+            resDiv.classList.add('show');
+        } catch (e) {
+            errDiv.textContent = e.message === "KEY_ERROR" ? "Ungültiger API-Key!" : "Fehler beim Abruf der Daten.";
+            errDiv.classList.add('show');
+        } finally {
+            loader.style.display = 'none';
         }
+    }
 
-        // Enter-Taste unterstützen
-        document.getElementById('silver').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') calculateValue();
-        });
+    function format(v) {
+        return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(v);
+    }
+</script>
 
-        document.getElementById('gold').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') calculateValue();
-        });
-    </script>
 </body>
 </html>
