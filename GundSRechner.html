@@ -15,6 +15,7 @@
         .footer { font-size: 11px; color: #888; text-align: center; margin-top: 20px; }
         #keySection { background: #fffbe6; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
         .change-key { font-size: 12px; color: #007aff; text-decoration: underline; cursor: pointer; display: block; margin-top: 5px; }
+        .price-line { display: flex; justify-content: space-between; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -37,23 +38,24 @@
     <button onclick="berechneWerte()">Werte aktualisieren</button>
 
     <div id="ausgabe" class="result" style="display:none;">
-        <p id="goldErgebnis">Gold: -</p>
-        <p id="silberErgebnis">Silber: -</p>
+        <div class="price-line"><span>Gold:</span> <span id="goldErgebnis">-</span></div>
+        <div class="price-line"><span>Silber:</span> <span id="silberErgebnis">-</span></div>
         <hr>
-        <p id="gesamtErgebnis" style="font-size: 18px;"><strong>Gesamt: -</strong></p>
+        <div class="price-line" style="font-size: 18px; font-weight: bold;">
+            <span>Gesamt:</span> <span id="gesamtErgebnis">-</span>
+        </div>
     </div>
     
     <div class="footer">Stand: <span id="zeitstempel">-</span></div>
 </div>
 
 <script>
-    // 1. Beim Start: Werte laden und prüfen ob Key da ist
     window.onload = function() {
         const savedKey = localStorage.getItem('goldKey');
         if (savedKey) {
             document.getElementById('apiKey').value = savedKey;
-            document.getElementById('keySection').style.display = 'none'; // Verstecken
-            document.getElementById('changeKeyLink').style.display = 'block'; // Link zeigen
+            document.getElementById('keySection').style.display = 'none';
+            document.getElementById('changeKeyLink').style.display = 'block';
         }
         if (localStorage.getItem('goldUnzen')) document.getElementById('goldUnzen').value = localStorage.getItem('goldUnzen');
         if (localStorage.getItem('silberUnzen')) document.getElementById('silberUnzen').value = localStorage.getItem('silberUnzen');
@@ -63,6 +65,11 @@
         document.getElementById('keySection').style.display = 'block';
         document.getElementById('changeKeyLink').style.display = 'none';
     }
+
+    // Formatierungs-Funktion für Euro-Werte
+    const euroFormat = (wert) => {
+        return wert.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
+    };
 
     async function berechneWerte() {
         const key = document.getElementById('apiKey').value.trim();
@@ -75,46 +82,35 @@
             return;
         }
 
-        // Speichern
         localStorage.setItem('goldKey', key);
         localStorage.setItem('goldUnzen', gUnzen);
         localStorage.setItem('silberUnzen', sUnzen);
         
-        // UI aufräumen
         document.getElementById('keySection').style.display = 'none';
         document.getElementById('changeKeyLink').style.display = 'block';
 
         try {
-            // Abfrage Gold (XAU in EUR)
-            const resGold = await fetch("https://www.goldapi.io/api/XAU/EUR", {
-                headers: { "x-access-token": key }
-            });
+            const resGold = await fetch("https://www.goldapi.io/api/XAU/EUR", { headers: { "x-access-token": key } });
             const dataGold = await resGold.json();
 
-            // Abfrage Silber (XAG in EUR)
-            const resSilber = await fetch("https://www.goldapi.io/api/XAG/EUR", {
-                headers: { "x-access-token": key }
-            });
+            const resSilber = await fetch("https://www.goldapi.io/api/XAG/EUR", { headers: { "x-access-token": key } });
             const dataSilber = await resSilber.json();
 
             if (dataGold.price && dataSilber.price) {
-                const gPreis = dataGold.price;
-                const sPreis = dataSilber.price;
-                
-                const gWert = gPreis * gUnzen;
-                const sWert = sPreis * sUnzen;
+                const gWert = dataGold.price * gUnzen;
+                const sWert = dataSilber.price * sUnzen;
 
                 document.getElementById('ausgabe').style.display = 'block';
-                document.getElementById('goldErgebnis').innerText = `Gold (pro Oz: ${gPreis.toFixed(2)}€): ${gWert.toFixed(2)} €`;
-                document.getElementById('silberErgebnis').innerText = `Silber (pro Oz: ${sPreis.toFixed(2)}€): ${sWert.toFixed(2)} €`;
-                document.getElementById('gesamtErgebnis').innerHTML = `<strong>Gesamt: ${(gWert + sWert).toFixed(2)} €</strong>`;
+                document.getElementById('goldErgebnis').innerText = euroFormat(gWert);
+                document.getElementById('silberErgebnis').innerText = euroFormat(sWert);
+                document.getElementById('gesamtErgebnis').innerText = euroFormat(gWert + sWert);
                 document.getElementById('zeitstempel').innerText = new Date().toLocaleString('de-DE');
             } else {
-                alert("Fehler vom Anbieter: " + (dataGold.error || "Key prüfen!"));
+                alert("Fehler: Key prüfen oder Limit erreicht.");
                 showKeyField();
             }
         } catch (error) {
-            alert("Netzwerkfehler: Bitte Internetverbindung prüfen.");
+            alert("Netzwerkfehler.");
         }
     }
 </script>
