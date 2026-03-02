@@ -5,15 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bianca & Werners Goldrechner</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f9; }
-        .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 10px; shadow: 0 0 10px rgba(0,0,0,0.1); }
-        h2 { color: #d4af37; text-align: center; }
-        label { display: block; margin-top: 10px; font-weight: bold; }
-        input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background-color: #d4af37; color: white; border: none; border-radius: 5px; margin-top: 20px; cursor: pointer; font-size: 16px; }
-        button:hover { background-color: #b8962e; }
-        .result { margin-top: 20px; padding: 15px; background: #eef; border-radius: 5px; }
-        .footer { font-size: 10px; color: #888; text-align: center; margin-top: 20px; }
+        body { font-family: -apple-system, sans-serif; padding: 20px; background-color: #f4f4f9; color: #333; }
+        .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { color: #d4af37; text-align: center; margin-bottom: 20px; }
+        label { display: block; margin-top: 15px; font-weight: bold; font-size: 14px; }
+        input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 15px; background-color: #d4af37; color: white; border: none; border-radius: 8px; margin-top: 20px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .result { margin-top: 20px; padding: 15px; background: #f9f9ff; border-left: 5px solid #d4af37; border-radius: 5px; }
+        .footer { font-size: 11px; color: #888; text-align: center; margin-top: 20px; }
+        #keySection { background: #fffbe6; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+        .change-key { font-size: 12px; color: #007aff; text-decoration: underline; cursor: pointer; display: block; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -21,8 +22,11 @@
 <div class="container">
     <h2>G & S Rechner</h2>
 
-    <label for="apiKey">API Key (wird gespeichert):</label>
-    <input type="password" id="apiKey" placeholder="Hier Key einfügen">
+    <div id="keySection">
+        <label for="apiKey">API Key eingeben:</label>
+        <input type="password" id="apiKey" placeholder="Dein GoldAPI Key">
+    </div>
+    <span id="changeKeyLink" class="change-key" style="display:none;" onclick="showKeyField()">API Key ändern</span>
 
     <label for="goldUnzen">Anzahl Unzen Gold:</label>
     <input type="number" id="goldUnzen" step="0.01" placeholder="0.00">
@@ -30,69 +34,87 @@
     <label for="silberUnzen">Anzahl Unzen Silber:</label>
     <input type="number" id="silberUnzen" step="0.01" placeholder="0.00">
 
-    <button onclick="berechneWerte()">Preise laden & berechnen</button>
+    <button onclick="berechneWerte()">Werte aktualisieren</button>
 
     <div id="ausgabe" class="result" style="display:none;">
-        <strong>Aktueller Wert:</strong>
         <p id="goldErgebnis">Gold: -</p>
         <p id="silberErgebnis">Silber: -</p>
         <hr>
-        <p id="gesamtErgebnis"><strong>Gesamt: -</strong></p>
+        <p id="gesamtErgebnis" style="font-size: 18px;"><strong>Gesamt: -</strong></p>
     </div>
     
     <div class="footer">Stand: <span id="zeitstempel">-</span></div>
 </div>
 
 <script>
-    // 1. Laden der gespeicherten Werte beim Start
+    // 1. Beim Start: Werte laden und prüfen ob Key da ist
     window.onload = function() {
-        if (localStorage.getItem('goldKey')) document.getElementById('apiKey').value = localStorage.getItem('goldKey');
+        const savedKey = localStorage.getItem('goldKey');
+        if (savedKey) {
+            document.getElementById('apiKey').value = savedKey;
+            document.getElementById('keySection').style.display = 'none'; // Verstecken
+            document.getElementById('changeKeyLink').style.display = 'block'; // Link zeigen
+        }
         if (localStorage.getItem('goldUnzen')) document.getElementById('goldUnzen').value = localStorage.getItem('goldUnzen');
         if (localStorage.getItem('silberUnzen')) document.getElementById('silberUnzen').value = localStorage.getItem('silberUnzen');
     };
 
+    function showKeyField() {
+        document.getElementById('keySection').style.display = 'block';
+        document.getElementById('changeKeyLink').style.display = 'none';
+    }
+
     async function berechneWerte() {
         const key = document.getElementById('apiKey').value.trim();
-        const gUnzen = document.getElementById('goldUnzen').value;
-        const sUnzen = document.getElementById('silberUnzen').value;
-
-        // 2. Werte lokal auf dem iPhone merken
-        localStorage.setItem('goldKey', key);
-        localStorage.setItem('goldUnzen', gUnzen);
-        localStorage.setItem('silberUnzen', sUnzen);
+        const gUnzen = parseFloat(document.getElementById('goldUnzen').value) || 0;
+        const sUnzen = parseFloat(document.getElementById('silberUnzen').value) || 0;
 
         if (!key) {
             alert("Bitte erst den API Key eingeben!");
+            showKeyField();
             return;
         }
 
+        // Speichern
+        localStorage.setItem('goldKey', key);
+        localStorage.setItem('goldUnzen', gUnzen);
+        localStorage.setItem('silberUnzen', sUnzen);
+        
+        // UI aufräumen
+        document.getElementById('keySection').style.display = 'none';
+        document.getElementById('changeKeyLink').style.display = 'block';
+
         try {
-            // Beispiel-Abfrage (hier musst du ggf. die URL deines Anbieters anpassen)
-            const response = await fetch(`https://www.goldapi.io/api/XAU/EUR`, {
+            // Abfrage Gold (XAU in EUR)
+            const resGold = await fetch("https://www.goldapi.io/api/XAU/EUR", {
                 headers: { "x-access-token": key }
             });
-            const dataGold = await response.json();
-            
-            const responseSilber = await fetch(`https://www.goldapi.io/api/XAG/EUR`, {
+            const dataGold = await resGold.json();
+
+            // Abfrage Silber (XAG in EUR)
+            const resSilber = await fetch("https://www.goldapi.io/api/XAG/EUR", {
                 headers: { "x-access-token": key }
             });
-            const dataSilber = await responseSilber.json();
+            const dataSilber = await resSilber.json();
 
             if (dataGold.price && dataSilber.price) {
-                const goldWert = dataGold.price * gUnzen;
-                const silberWert = dataSilber.price * sUnzen;
+                const gPreis = dataGold.price;
+                const sPreis = dataSilber.price;
+                
+                const gWert = gPreis * gUnzen;
+                const sWert = sPreis * sUnzen;
 
                 document.getElementById('ausgabe').style.display = 'block';
-                document.getElementById('goldErgebnis').innerText = `Gold: ${goldWert.toFixed(2)} €`;
-                document.getElementById('silberErgebnis').innerText = `Silber: ${silberWert.toFixed(2)} €`;
-                document.getElementById('gesamtErgebnis').innerHTML = `<strong>Gesamt: ${(goldWert + silberWert).toFixed(2)} €</strong>`;
-                document.getElementById('zeitstempel').innerText = new Date().toLocaleString();
+                document.getElementById('goldErgebnis').innerText = `Gold (pro Oz: ${gPreis.toFixed(2)}€): ${gWert.toFixed(2)} €`;
+                document.getElementById('silberErgebnis').innerText = `Silber (pro Oz: ${sPreis.toFixed(2)}€): ${sWert.toFixed(2)} €`;
+                document.getElementById('gesamtErgebnis').innerHTML = `<strong>Gesamt: ${(gWert + sWert).toFixed(2)} €</strong>`;
+                document.getElementById('zeitstempel').innerText = new Date().toLocaleString('de-DE');
             } else {
-                alert("Fehler: Key ungültig oder Limit erreicht.");
+                alert("Fehler vom Anbieter: " + (dataGold.error || "Key prüfen!"));
+                showKeyField();
             }
         } catch (error) {
-            alert("Verbindung fehlgeschlagen.");
-            console.error(error);
+            alert("Netzwerkfehler: Bitte Internetverbindung prüfen.");
         }
     }
 </script>
