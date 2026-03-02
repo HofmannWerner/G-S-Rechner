@@ -3,288 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gold & Silber Rechner - Live</title>
+    <title>Bianca & Werners Goldrechner</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 40px;
-            max-width: 500px;
-            width: 100%;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 28px;
-        }
-
-        .input-group {
-            margin-bottom: 25px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        input[type="number"] {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-
-        input[type="number"]:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            margin-top: 10px;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .results {
-            margin-top: 30px;
-            padding: 25px;
-            background: #f8f9fa;
-            border-radius: 15px;
-            display: none;
-        }
-
-        .results.show {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .price-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .price-value {
-            font-weight: 700;
-            color: #333;
-        }
-
-        .total {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 2px solid #667eea;
-        }
-
-        .total .price-value {
-            color: #667eea;
-            font-size: 20px;
-        }
-
-        .loading {
-            text-align: center;
-            color: #667eea;
-            font-weight: 600;
-            margin-top: 15px;
-            display: none;
-        }
-
-        .error {
-            background: #fee;
-            color: #c33;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
-            display: none;
-        }
-
-        .error.show { display: block; }
-
-        .timestamp {
-            text-align: center;
-            color: #999;
-            font-size: 12px;
-            margin-top: 15px;
-        }
-
-        .key-btn {
-            background: none;
-            border: none;
-            color: #667eea;
-            font-size: 12px;
-            text-decoration: underline;
-            cursor: pointer;
-            width: auto;
-            margin: 10px auto;
-            display: block;
-        }
+        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f9; }
+        .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 10px; shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h2 { color: #d4af37; text-align: center; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #d4af37; color: white; border: none; border-radius: 5px; margin-top: 20px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #b8962e; }
+        .result { margin-top: 20px; padding: 15px; background: #eef; border-radius: 5px; }
+        .footer { font-size: 10px; color: #888; text-align: center; margin-top: 20px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>💰 Edelmetall Rechner</h1>
+    <h2>G & S Rechner</h2>
 
-    <div class="input-group">
-        <label for="silver">🥈 Anzahl Unzen Silber</label>
-        <input type="number" id="silver" min="0" step="0.01" value="0">
+    <label for="apiKey">API Key (wird gespeichert):</label>
+    <input type="password" id="apiKey" placeholder="Hier Key einfügen">
+
+    <label for="goldUnzen">Anzahl Unzen Gold:</label>
+    <input type="number" id="goldUnzen" step="0.01" placeholder="0.00">
+
+    <label for="silberUnzen">Anzahl Unzen Silber:</label>
+    <input type="number" id="silberUnzen" step="0.01" placeholder="0.00">
+
+    <button onclick="berechneWerte()">Preise laden & berechnen</button>
+
+    <div id="ausgabe" class="result" style="display:none;">
+        <strong>Aktueller Wert:</strong>
+        <p id="goldErgebnis">Gold: -</p>
+        <p id="silberErgebnis">Silber: -</p>
+        <hr>
+        <p id="gesamtErgebnis"><strong>Gesamt: -</strong></p>
     </div>
-
-    <div class="input-group">
-        <label for="gold">🥇 Anzahl Unzen Gold</label>
-        <input type="number" id="gold" min="0" step="0.01" value="0">
-    </div>
-
-    <button id="calculateBtn" onclick="calculateValue()">Wert berechnen</button>
-
-    <button class="key-btn" onclick="askForApiKey()">API-Key ändern</button>
-
-    <div class="loading" id="loading">Preise werden live abgefragt...</div>
-    <div class="error" id="error"></div>
-
-    <div class="results" id="results">
-        <div class="price-item">
-            <span>Silber (1 oz)</span>
-            <span class="price-value" id="silverPrice">-</span>
-        </div>
-        <div class="price-item">
-            <span>Silber Wert</span>
-            <span class="price-value" id="silverTotal">-</span>
-        </div>
-
-        <div class="price-item" style="margin-top: 10px;">
-            <span>Gold (1 oz)</span>
-            <span class="price-value" id="goldPrice">-</span>
-        </div>
-        <div class="price-item">
-            <span>Gold Wert</span>
-            <span class="price-value" id="goldTotal">-</span>
-        </div>
-
-        <div class="price-item total">
-            <span><strong>Gesamtwert</strong></span>
-            <span class="price-value" id="totalValue">-</span>
-        </div>
-
-        <div class="timestamp" id="timestamp"></div>
-    </div>
+    
+    <div class="footer">Stand: <span id="zeitstempel">-</span></div>
 </div>
 
 <script>
-    const API_URL = 'https://www.goldapi.io/api';
+    // 1. Laden der gespeicherten Werte beim Start
+    window.onload = function() {
+        if (localStorage.getItem('goldKey')) document.getElementById('apiKey').value = localStorage.getItem('goldKey');
+        if (localStorage.getItem('goldUnzen')) document.getElementById('goldUnzen').value = localStorage.getItem('goldUnzen');
+        if (localStorage.getItem('silberUnzen')) document.getElementById('silberUnzen').value = localStorage.getItem('silberUnzen');
+    };
 
-    // Beim Start: Werte aus lokalem Speicher laden
-    window.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('silver').value = localStorage.getItem('silverOunces') || 0;
-        document.getElementById('gold').value = localStorage.getItem('goldOunces') || 0;
-    });
+    async function berechneWerte() {
+        const key = document.getElementById('apiKey').value.trim();
+        const gUnzen = document.getElementById('goldUnzen').value;
+        const sUnzen = document.getElementById('silberUnzen').value;
 
-    function askForApiKey() {
-        const key = prompt("Bitte GoldAPI.io Key eingeben:");
-        if (key) {
-            localStorage.setItem('gold_api_key', key.trim());
-            alert("Key gespeichert!");
-        }
-    }
-
-    async function fetchPrice(symbol, key) {
-        const res = await fetch(`${API_URL}/${symbol}/EUR`, {
-            headers: { "x-access-token": key, "Content-Type": "application/json" }
-        });
-        if (!res.ok) throw new Error(res.status === 403 ? "KEY_ERROR" : "API_ERROR");
-        return await res.json();
-    }
-
-    async function calculateValue() {
-        const silverOz = parseFloat(document.getElementById('silver').value) || 0;
-        const goldOz = parseFloat(document.getElementById('gold').value) || 0;
-        const key = localStorage.getItem('gold_api_key');
+        // 2. Werte lokal auf dem iPhone merken
+        localStorage.setItem('goldKey', key);
+        localStorage.setItem('goldUnzen', gUnzen);
+        localStorage.setItem('silberUnzen', sUnzen);
 
         if (!key) {
-            askForApiKey();
+            alert("Bitte erst den API Key eingeben!");
             return;
         }
 
-        // Werte speichern
-        localStorage.setItem('silverOunces', silverOz);
-        localStorage.setItem('goldOunces', goldOz);
-
-        const loader = document.getElementById('loading');
-        const errDiv = document.getElementById('error');
-        const resDiv = document.getElementById('results');
-
-        errDiv.classList.remove('show');
-        resDiv.classList.remove('show');
-        loader.style.display = 'block';
-
         try {
-            const [goldData, silverData] = await Promise.all([
-                fetchPrice('XAU', key),
-                fetchPrice('XAG', key)
-            ]);
+            // Beispiel-Abfrage (hier musst du ggf. die URL deines Anbieters anpassen)
+            const response = await fetch(`https://www.goldapi.io/api/XAU/EUR`, {
+                headers: { "x-access-token": key }
+            });
+            const dataGold = await response.json();
+            
+            const responseSilber = await fetch(`https://www.goldapi.io/api/XAG/EUR`, {
+                headers: { "x-access-token": key }
+            });
+            const dataSilber = await responseSilber.json();
 
-            document.getElementById('goldPrice').textContent = format(goldData.price);
-            document.getElementById('goldTotal').textContent = format(goldData.price * goldOz);
-            document.getElementById('silverPrice').textContent = format(silverData.price);
-            document.getElementById('silverTotal').textContent = format(silverData.price * silverOz);
-            document.getElementById('totalValue').textContent = format((goldData.price * goldOz) + (silverData.price * silverOz));
+            if (dataGold.price && dataSilber.price) {
+                const goldWert = dataGold.price * gUnzen;
+                const silberWert = dataSilber.price * sUnzen;
 
-            document.getElementById('timestamp').textContent = 'Stand: ' + new Date().toLocaleString('de-DE');
-            resDiv.classList.add('show');
-        } catch (e) {
-            errDiv.textContent = e.message === "KEY_ERROR" ? "Ungültiger API-Key!" : "Fehler beim Abruf der Daten.";
-            errDiv.classList.add('show');
-        } finally {
-            loader.style.display = 'none';
+                document.getElementById('ausgabe').style.display = 'block';
+                document.getElementById('goldErgebnis').innerText = `Gold: ${goldWert.toFixed(2)} €`;
+                document.getElementById('silberErgebnis').innerText = `Silber: ${silberWert.toFixed(2)} €`;
+                document.getElementById('gesamtErgebnis').innerHTML = `<strong>Gesamt: ${(goldWert + silberWert).toFixed(2)} €</strong>`;
+                document.getElementById('zeitstempel').innerText = new Date().toLocaleString();
+            } else {
+                alert("Fehler: Key ungültig oder Limit erreicht.");
+            }
+        } catch (error) {
+            alert("Verbindung fehlgeschlagen.");
+            console.error(error);
         }
-    }
-
-    function format(v) {
-        return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(v);
     }
 </script>
 
