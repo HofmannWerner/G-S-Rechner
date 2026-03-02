@@ -5,17 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bianca & Werners Goldrechner</title>
     <style>
-        body { font-family: -apple-system, sans-serif; padding: 20px; background-color: #f4f4f9; color: #333; }
-        .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { color: #d4af37; text-align: center; margin-bottom: 20px; }
-        label { display: block; margin-top: 15px; font-weight: bold; font-size: 14px; }
-        input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; padding: 15px; background-color: #d4af37; color: white; border: none; border-radius: 8px; margin-top: 20px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        .result { margin-top: 20px; padding: 15px; background: #f9f9ff; border-left: 5px solid #d4af37; border-radius: 5px; }
-        .footer { font-size: 11px; color: #888; text-align: center; margin-top: 20px; }
-        #keySection { background: #fffbe6; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
-        .change-key { font-size: 12px; color: #007aff; text-decoration: underline; cursor: pointer; display: block; margin-top: 5px; }
+        body { font-family: -apple-system, sans-serif; padding: 15px; background-color: #f4f4f9; color: #333; }
+        .container { max-width: 420px; margin: auto; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { color: #d4af37; text-align: center; margin-bottom: 15px; font-size: 20px; }
+
+        .input-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
+        .input-group { flex: 1; }
+        .price-info { flex: 1; font-size: 13px; color: #666; text-align: right; line-height: 1.2; }
+
+        label { display: block; font-weight: bold; font-size: 13px; margin-bottom: 3px; }
+        input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+
+        button { width: 100%; padding: 14px; background-color: #d4af37; color: white; border: none; border-radius: 8px; margin-top: 15px; cursor: pointer; font-size: 16px; font-weight: bold; }
+
+        .result { margin-top: 15px; padding: 15px; background: #f9f9ff; border-left: 5px solid #d4af37; border-radius: 5px; }
         .price-line { display: flex; justify-content: space-between; margin-bottom: 5px; }
+
+        #keySection { background: #fffbe6; padding: 10px; border-radius: 8px; margin-bottom: 15px; }
+        .change-key { font-size: 11px; color: #007aff; text-decoration: underline; cursor: pointer; display: block; margin-bottom: 10px; text-align: center; }
+        .footer { font-size: 10px; color: #888; text-align: center; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -24,28 +32,38 @@
     <h2>G & S Rechner</h2>
 
     <div id="keySection">
-        <label for="apiKey">API Key eingeben:</label>
-        <input type="password" id="apiKey" placeholder="Dein GoldAPI Key">
+        <label for="apiKey">API Key:</label>
+        <input type="password" id="apiKey" placeholder="Dein Key">
     </div>
     <span id="changeKeyLink" class="change-key" style="display:none;" onclick="showKeyField()">API Key ändern</span>
 
-    <label for="goldUnzen">Anzahl Unzen Gold:</label>
-    <input type="number" id="goldUnzen" step="0.01" placeholder="0.00">
+    <div class="input-row">
+        <div class="input-group">
+            <label for="goldUnzen">Unzen Gold:</label>
+            <input type="number" id="goldUnzen" step="0.01" placeholder="0.00">
+        </div>
+        <div class="price-info" id="goldKursInfo">Kurs: -</div>
+    </div>
 
-    <label for="silberUnzen">Anzahl Unzen Silber:</label>
-    <input type="number" id="silberUnzen" step="0.01" placeholder="0.00">
+    <div class="input-row">
+        <div class="input-group">
+            <label for="silberUnzen">Unzen Silber:</label>
+            <input type="number" id="silberUnzen" step="0.01" placeholder="0.00">
+        </div>
+        <div class="price-info" id="silberKursInfo">Kurs: -</div>
+    </div>
 
-    <button onclick="berechneWerte()">Werte aktualisieren</button>
+    <button onclick="berechneWerte()">Aktualisieren</button>
 
     <div id="ausgabe" class="result" style="display:none;">
-        <div class="price-line"><span>Gold:</span> <span id="goldErgebnis">-</span></div>
-        <div class="price-line"><span>Silber:</span> <span id="silberErgebnis">-</span></div>
+        <div class="price-line"><span>Wert Gold:</span> <span id="goldErgebnis">-</span></div>
+        <div class="price-line"><span>Wert Silber:</span> <span id="silberErgebnis">-</span></div>
         <hr>
         <div class="price-line" style="font-size: 18px; font-weight: bold;">
             <span>Gesamt:</span> <span id="gesamtErgebnis">-</span>
         </div>
     </div>
-    
+
     <div class="footer">Stand: <span id="zeitstempel">-</span></div>
 </div>
 
@@ -66,7 +84,6 @@
         document.getElementById('changeKeyLink').style.display = 'none';
     }
 
-    // Formatierungs-Funktion für Euro-Werte
     const euroFormat = (wert) => {
         return wert.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
     };
@@ -76,16 +93,12 @@
         const gUnzen = parseFloat(document.getElementById('goldUnzen').value) || 0;
         const sUnzen = parseFloat(document.getElementById('silberUnzen').value) || 0;
 
-        if (!key) {
-            alert("Bitte erst den API Key eingeben!");
-            showKeyField();
-            return;
-        }
+        if (!key) { alert("Bitte erst den API Key eingeben!"); showKeyField(); return; }
 
         localStorage.setItem('goldKey', key);
         localStorage.setItem('goldUnzen', gUnzen);
         localStorage.setItem('silberUnzen', sUnzen);
-        
+
         document.getElementById('keySection').style.display = 'none';
         document.getElementById('changeKeyLink').style.display = 'block';
 
@@ -97,17 +110,24 @@
             const dataSilber = await resSilber.json();
 
             if (dataGold.price && dataSilber.price) {
-                const gWert = dataGold.price * gUnzen;
-                const sWert = dataSilber.price * sUnzen;
+                const gPreis = dataGold.price;
+                const sPreis = dataSilber.price;
 
+                const gWert = gPreis * gUnzen;
+                const sWert = sPreis * sUnzen;
+
+                // Anzeige der Kurse pro Unze
+                document.getElementById('goldKursInfo').innerHTML = `Kurs: <br><strong>${euroFormat(gPreis)}</strong>`;
+                document.getElementById('silberKursInfo').innerHTML = `Kurs: <br><strong>${euroFormat(sPreis)}</strong>`;
+
+                // Anzeige der Ergebnisse
                 document.getElementById('ausgabe').style.display = 'block';
                 document.getElementById('goldErgebnis').innerText = euroFormat(gWert);
                 document.getElementById('silberErgebnis').innerText = euroFormat(sWert);
                 document.getElementById('gesamtErgebnis').innerText = euroFormat(gWert + sWert);
                 document.getElementById('zeitstempel').innerText = new Date().toLocaleString('de-DE');
             } else {
-                alert("Fehler: Key prüfen oder Limit erreicht.");
-                showKeyField();
+                alert("Fehler: API-Limit erreicht oder Key falsch.");
             }
         } catch (error) {
             alert("Netzwerkfehler.");
